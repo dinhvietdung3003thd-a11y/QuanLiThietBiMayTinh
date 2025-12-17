@@ -113,31 +113,53 @@ public class KhoService {
         }
     }
     
+ // HÀM XÓA NÂNG CẤP: Dọn dẹp sạch sẽ dữ liệu liên quan trước khi xóa sản phẩm
     public boolean xoaSanPham(String maSP) {
         Connection conn = null;
         try {
             conn = DatabaseHelper.getConnection();
-            
-            // Lưu ý: Nếu sản phẩm đã có Serial hoặc đã nằm trong hóa đơn bán hàng,
-            // MySQL sẽ chặn không cho xóa để bảo toàn dữ liệu (Foreign Key).
-            // Muốn xóa triệt để thì phải xóa bảng con trước, nhưng ở đây mình làm đơn giản.
-            
-            String sql = "DELETE FROM Products WHERE productID = ?";
-            PreparedStatement pstm = conn.prepareStatement(sql);
-            pstm.setString(1, maSP);
-            
-            int rowsAffected = pstm.executeUpdate();
-            return rowsAffected > 0; // Trả về true nếu xóa thành công
+            conn.setAutoCommit(false); // Bắt đầu Transaction (để xóa nhiều bảng cùng lúc)
 
-        } catch (java.sql.SQLIntegrityConstraintViolationException e) {
-            // Lỗi này xảy ra khi SP đã bán hoặc có Serial
-            System.out.println("Không thể xóa vì sản phẩm này đang có dữ liệu liên quan (Serial/Hóa đơn)");
-            return false;
+            // 1. KIỂM TRA AN TOÀN: Nếu đã từng bán cái nào rồi thì TUYỆT ĐỐI KHÔNG XÓA
+            // (Vì xóa sẽ làm mất lịch sử mua hàng của khách trong bảng Hóa Đơn)
+            String sqlCheck = "SELECT count(*) FROM ProductSerials WHERE productID = ? AND status = 'SOLD'";
+            PreparedStatement pstmCheck = conn.prepareStatement(sqlCheck);
+            pstmCheck.setString(1, maSP);
+            ResultSet rs = pstmCheck.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                return false; // Báo thất bại: Đã có máy bán ra, không được xóa!
+            }
+
+            // 2. NẾU CHƯA BÁN: Tiến hành dọn dẹp dữ liệu rác trước
+            
+            // A. Xóa lịch sử kiểm kê của sản phẩm này (nếu có)
+            String sqlDelKiemKe = "DELETE FROM ChiTietKiemKe WHERE maSP = ?";
+            PreparedStatement pstmDelKiemKe = conn.prepareStatement(sqlDelKiemKe);
+            pstmDelKiemKe.setString(1, maSP);
+            pstmDelKiemKe.executeUpdate();
+
+            // B. Xóa các mã Serial đang tồn kho (AVAILABLE)
+            // (Phải xóa cái này trước thì mới xóa được Sản phẩm)
+            String sqlDelSerial = "DELETE FROM ProductSerials WHERE productID = ?";
+            PreparedStatement pstmDelSerial = conn.prepareStatement(sqlDelSerial);
+            pstmDelSerial.setString(1, maSP);
+            pstmDelSerial.executeUpdate();
+
+            // C. Cuối cùng: Xóa Sản phẩm trong bảng Products
+            String sqlDelProduct = "DELETE FROM Products WHERE productID = ?";
+            PreparedStatement pstmDelProduct = conn.prepareStatement(sqlDelProduct);
+            pstmDelProduct.setString(1, maSP);
+            int rows = pstmDelProduct.executeUpdate();
+
+            conn.commit(); // Chốt thay đổi
+            return rows > 0;
+
         } catch (Exception e) {
+            try { if (conn != null) conn.rollback(); } catch (SQLException ex) {}
             e.printStackTrace();
             return false;
         } finally {
-            try { if (conn != null) conn.close(); } catch (Exception ex) {}
+            try { if (conn != null) conn.close(); } catch (SQLException ex) {}
         }
     }
 }
