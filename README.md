@@ -5,11 +5,13 @@ Mở XAMPP Control Panel.
 Bấm nút Start ở 2 dòng:
 Apache (Web server)
 MySQL (Database server) (Khi 2 dòng chuyển sang màu xanh lá là OK).
+
 Bước 2: Tạo Cơ sở dữ liệu
 Mở trình duyệt web, truy cập: http://localhost/phpmyadmin
 Nhìn cột bên trái, bấm New.
 Ô "Database name" nhập chính xác: quanlysinhvien
 Bấm Create.
+
 Bước 3: Chạy script SQL
 Bấm vào tab SQL ở thanh menu trên cùng.
 Copy toàn bộ đoạn code SQL dưới đây và dán vào ô trống:
@@ -154,3 +156,4 @@ INSERT INTO chitiethoadon (maHD, serialNumber, giaBan) VALUES (1, 'SN002', 15000
 
 -- Tạo thử phiếu bảo hành cho máy SN002
 INSERT INTO phieubaohanh (serialNumber, loiKhachBao) VALUES ('SN002', N'Lỗi màn hình');
+--lưu ý : khi run vào file databasehelper đổi phần mật khẩu thành "".
