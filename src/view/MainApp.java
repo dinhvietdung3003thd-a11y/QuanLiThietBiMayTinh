@@ -3,70 +3,74 @@ package view;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import model.NguoiDung;
 
-// Import đầy đủ các Panel chức năng
+// Import Model chuẩn (Không dùng NguoiDung nữa)
+import model.NhanVien;
+
+// Import các Panel chức năng
 import view.PanelBanHang;
 import view.PanelKho;
 import view.PanelBaoHanh;
 import view.PanelThongKe;
-import view.PanelNhanVien;   // Panel mới
-import view.PanelNhaCungCap; // Panel mới
+import view.PanelNhanVien;
+import view.PanelNhaCungCap;
 
 public class MainApp extends JFrame {
     private CardLayout cardLayout;
     private JPanel mainPanel;
     private JPanel menuPanel;
     
-    // Khai báo các nút Menu
+    // Các nút Menu
     private JButton btnBanHang, btnKho, btnBaoHanh, btnThongKe;
     private JButton btnNhanVien, btnNhaCungCap, btnThoat;
 
-    // Khai báo các màn hình (Panel)
+    // Các màn hình chức năng
     private PanelBanHang pnlBanHang;
     private PanelKho pnlKho;
     private PanelBaoHanh pnlBaoHanh;
     private PanelThongKe pnlThongKe;
-    private PanelNhanVien pnlNhanVien;     // Mới
-    private PanelNhaCungCap pnlNhaCungCap; // Mới
+    private PanelNhanVien pnlNhanVien;
+    private PanelNhaCungCap pnlNhaCungCap;
 
     public MainApp() {
         // 1. GỌI FORM ĐĂNG NHẬP
         LoginDialog login = new LoginDialog(this);
         login.setVisible(true);
         
-        NguoiDung user = login.taiKhoanHienTai;
+        // Lấy thông tin NhanVien đã đăng nhập thành công
+        NhanVien user = login.taiKhoanHienTai;
 
-        // Nếu người dùng tắt form login hoặc chưa đăng nhập thì thoát app
+        // Nếu chưa đăng nhập (tắt form login) thì thoát chương trình
         if (user == null) {
             System.exit(0);
         }
 
         // 2. THIẾT LẬP GIAO DIỆN CHÍNH
-        setTitle("HỆ THỐNG QUẢN LÝ MÁY TÍNH - User: " + user.getFullName() + " (" + user.getRole() + ")");
-        setSize(1350, 750); // Kích thước cửa sổ
-        setLocationRelativeTo(null); // Ra giữa màn hình
+        // Hiển thị tên và quyền trên thanh tiêu đề
+        setTitle("HỆ THỐNG QUẢN LÝ - Xin chào: " + user.getHoTen() + " (" + user.getQuyen() + ")");
+        setSize(1350, 750);
+        setLocationRelativeTo(null);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         // --- A. MENU BÊN TRÁI ---
         menuPanel = new JPanel(new BorderLayout());
-        menuPanel.setBackground(new Color(20, 30, 48)); // Màu nền tối
+        menuPanel.setBackground(new Color(20, 30, 48)); // Màu xanh đen sang trọng
         menuPanel.setPreferredSize(new Dimension(230, 0));
 
-        JPanel pnlTopMenu = new JPanel(new GridLayout(0, 1, 0, 10)); // Xếp dọc, cách nhau 10px
+        JPanel pnlTopMenu = new JPanel(new GridLayout(0, 1, 0, 10)); 
         pnlTopMenu.setOpaque(false);
         pnlTopMenu.setBorder(new EmptyBorder(20, 10, 0, 10));
 
-        // Tạo các nút menu
+        // Tạo các nút
         btnBanHang = createMenuButton("BÁN HÀNG");
         btnKho = createMenuButton("KHO HÀNG");
         btnBaoHanh = createMenuButton("BẢO HÀNH");
         btnThongKe = createMenuButton("THỐNG KÊ");
-        btnNhaCungCap = createMenuButton("NHÀ CUNG CẤP"); // Mới
-        btnNhanVien = createMenuButton("QUẢN LÝ NHÂN SỰ"); // Mới
+        btnNhaCungCap = createMenuButton("NHÀ CUNG CẤP");
+        btnNhanVien = createMenuButton("NHÂN SỰ (ADMIN)");
         
-        // Thêm các nút vào Menu (Thứ tự từ trên xuống)
+        // Add vào Menu
         pnlTopMenu.add(btnBanHang);
         pnlTopMenu.add(btnKho);
         pnlTopMenu.add(btnBaoHanh);
@@ -74,23 +78,23 @@ public class MainApp extends JFrame {
         pnlTopMenu.add(btnNhaCungCap);
         pnlTopMenu.add(btnNhanVien);
 
-        // Nút Đăng xuất ở dưới cùng
+        // Nút Đăng xuất
         JPanel pnlBottomMenu = new JPanel(new GridLayout(1, 1));
         pnlBottomMenu.setOpaque(false);
         pnlBottomMenu.setBorder(new EmptyBorder(0, 10, 20, 10));
         btnThoat = createMenuButton("ĐĂNG XUẤT");
-        btnThoat.setBackground(new Color(192, 57, 43)); // Màu đỏ
+        btnThoat.setBackground(new Color(192, 57, 43)); // Đỏ
         pnlBottomMenu.add(btnThoat);
 
         menuPanel.add(pnlTopMenu, BorderLayout.NORTH);
         menuPanel.add(pnlBottomMenu, BorderLayout.SOUTH);
         add(menuPanel, BorderLayout.WEST);
 
-        // --- B. NỘI DUNG CHÍNH (PANEL BÊN PHẢI) ---
+        // --- B. NỘI DUNG CHÍNH (CARD LAYOUT) ---
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         
-        // Khởi tạo các màn hình con
+        // Khởi tạo các màn hình
         pnlBanHang = new PanelBanHang();
         pnlKho = new PanelKho();
         pnlBaoHanh = new PanelBaoHanh();
@@ -98,7 +102,7 @@ public class MainApp extends JFrame {
         pnlNhanVien = new PanelNhanVien();
         pnlNhaCungCap = new PanelNhaCungCap();
 
-        // Đưa các màn hình vào CardLayout kèm theo "Tên Thẻ" (Key)
+        // Add vào mainPanel với các từ khóa (Key)
         mainPanel.add(pnlBanHang, "BANHANG");
         mainPanel.add(pnlKho, "KHO");
         mainPanel.add(pnlBaoHanh, "BAOHANH");
@@ -108,66 +112,62 @@ public class MainApp extends JFrame {
         
         add(mainPanel, BorderLayout.CENTER);
 
-        // --- C. XỬ LÝ SỰ KIỆN CLICK NÚT ---
-        
-        btnBanHang.addActionListener(e -> {
-            cardLayout.show(mainPanel, "BANHANG");
+        // --- C. SỰ KIỆN CHUYỂN TAB ---
+        btnBanHang.addActionListener(e -> { 
+            cardLayout.show(mainPanel, "BANHANG"); 
             updateButtonColor(btnBanHang);
-            pnlBanHang.loadDataLenBang(); // Load lại dữ liệu cho mới
+            pnlBanHang.loadDataLenBang(); // Load dữ liệu mới nhất
         });
         
-        btnKho.addActionListener(e -> {
-            cardLayout.show(mainPanel, "KHO");
+        btnKho.addActionListener(e -> { 
+            cardLayout.show(mainPanel, "KHO"); 
             updateButtonColor(btnKho);
             pnlKho.loadData();
         });
         
-        btnBaoHanh.addActionListener(e -> {
-            cardLayout.show(mainPanel, "BAOHANH");
+        btnBaoHanh.addActionListener(e -> { 
+            cardLayout.show(mainPanel, "BAOHANH"); 
             updateButtonColor(btnBaoHanh);
         });
-
-        btnThongKe.addActionListener(e -> {
-            cardLayout.show(mainPanel, "THONGKE");
+        
+        btnThongKe.addActionListener(e -> { 
+            cardLayout.show(mainPanel, "THONGKE"); 
             updateButtonColor(btnThongKe);
             pnlThongKe.loadData();
         });
         
-        // Sự kiện cho 2 nút mới
-        btnNhanVien.addActionListener(e -> {
+        btnNhanVien.addActionListener(e -> { 
             cardLayout.show(mainPanel, "NHANVIEN");
             updateButtonColor(btnNhanVien);
             pnlNhanVien.loadDataLenBang();
         });
         
-        btnNhaCungCap.addActionListener(e -> {
+        btnNhaCungCap.addActionListener(e -> { 
             cardLayout.show(mainPanel, "NHACUNGCAP");
             updateButtonColor(btnNhaCungCap);
             pnlNhaCungCap.loadDataLenBang();
         });
         
         btnThoat.addActionListener(e -> {
-            dispose(); // Đóng cửa sổ hiện tại
-            new MainApp().setVisible(true); // Mở lại từ đầu (hiện Login)
+            dispose();
+            new MainApp().setVisible(true); // Đăng nhập lại
         });
         
-        // --- D. GỌI HÀM PHÂN QUYỀN ---
-        phanQuyen(user.getRole());
+        // 3. PHÂN QUYỀN (QUAN TRỌNG)
+        phanQuyen(user.getQuyen());
     }
 
-    // === HÀM PHÂN QUYỀN (Logic If-Else bạn yêu cầu) ===
+    // === HÀM PHÂN QUYỀN ===
     private void phanQuyen(String role) {
-        // 1. Mặc định: Ẩn TẤT CẢ các nút chức năng trước
+        // B1: Ẩn TẤT CẢ nút trước
         btnBanHang.setVisible(false);
         btnKho.setVisible(false);
         btnBaoHanh.setVisible(false);
         btnThongKe.setVisible(false);
-        
-        // Ẩn luôn 2 nút quản lý cao cấp
         btnNhanVien.setVisible(false);
         btnNhaCungCap.setVisible(false);
 
-        // 2. Bật lại nút dựa theo Quyền (Role)
+        // B2: Hiện lại theo đúng chức vụ
         if ("SALE".equalsIgnoreCase(role)) {
             // SALE: Chỉ bán hàng
             btnBanHang.setVisible(true);
@@ -181,35 +181,35 @@ public class MainApp extends JFrame {
             updateButtonColor(btnKho);
             
         } else if ("WARRANTY".equalsIgnoreCase(role)) {
-            // BẢO HÀNH: Chỉ làm bảo hành
+            // BẢO HÀNH: Chỉ bảo hành
             btnBaoHanh.setVisible(true);
             cardLayout.show(mainPanel, "BAOHANH");
             updateButtonColor(btnBaoHanh);
             
         } else if ("ACCOUNTANT".equalsIgnoreCase(role)) {
-            // KẾ TOÁN: Chỉ xem thống kê tiền nong
+            // KẾ TOÁN: Chỉ thống kê
             btnThongKe.setVisible(true);
             cardLayout.show(mainPanel, "THONGKE");
             updateButtonColor(btnThongKe);
             
         } else if ("ADMIN".equalsIgnoreCase(role)) {
-            // ADMIN: Hiện tất cả các nút cũ
+            // ADMIN: Hiện 4 nút cơ bản
             btnBanHang.setVisible(true);
             btnKho.setVisible(true);
             btnBaoHanh.setVisible(true);
             btnThongKe.setVisible(true);
             
-            // ĐẶC BIỆT: Admin mới được thấy 2 nút này
+            // ADMIN: ĐƯỢC PHÉP THẤY 2 NÚT QUẢN TRỊ NÀY
             btnNhanVien.setVisible(true);
             btnNhaCungCap.setVisible(true);
             
-            // Mặc định Admin vào Bán hàng trước
+            // Mặc định vào Bán hàng trước
             cardLayout.show(mainPanel, "BANHANG");
             updateButtonColor(btnBanHang);
         }
     }
 
-    // Hàm tạo giao diện nút bấm cho đẹp
+    // Hàm tạo nút Menu nhanh
     private JButton createMenuButton(String text) {
         JButton btn = new JButton(text);
         btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
@@ -221,17 +221,14 @@ public class MainApp extends JFrame {
         return btn;
     }
 
-    // Hàm đổi màu nút đang chọn (Active)
+    // Hàm đổi màu nút active
     private void updateButtonColor(JButton activeBtn) {
-        // Reset màu tất cả
         JButton[] allBtns = {btnBanHang, btnKho, btnBaoHanh, btnThongKe, btnNhanVien, btnNhaCungCap};
         for (JButton btn : allBtns) {
-            btn.setBackground(new Color(44, 62, 80));
+            btn.setBackground(new Color(44, 62, 80)); // Màu thường
         }
-        
-        // Set màu xanh sáng cho nút đang hiện
         if(activeBtn.isVisible()) {
-             activeBtn.setBackground(new Color(41, 128, 185));
+             activeBtn.setBackground(new Color(41, 128, 185)); // Màu sáng (đang chọn)
         }
     }
 

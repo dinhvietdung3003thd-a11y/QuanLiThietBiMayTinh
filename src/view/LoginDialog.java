@@ -2,23 +2,26 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
-import model.NguoiDung;
+// 1. SỬA IMPORT: Dùng NhanVien thay vì NguoiDung
+import model.NhanVien;
 import service.AuthService;
 
 public class LoginDialog extends JDialog {
     private JTextField txtUser;
     private JPasswordField txtPass;
     private AuthService authService = new AuthService();
-    public NguoiDung taiKhoanHienTai = null; // Lưu user đã đăng nhập
+    
+    // 2. SỬA BIẾN: Lưu đối tượng NhanVien
+    public NhanVien taiKhoanHienTai = null; 
 
     public LoginDialog(Frame parent) {
-        super(parent, "Đăng Nhập", true);
+        super(parent, "Đăng Nhập Hệ Thống", true);
         setLayout(new GridLayout(3, 2, 10, 10));
-        setSize(300, 180);
+        setSize(320, 180);
         setLocationRelativeTo(null);
 
-        add(new JLabel("  Tài khoản:"));
-        txtUser = new JTextField("admin"); // Mặc định cho nhanh test
+        add(new JLabel("  Mã Nhân Viên:")); // Sửa nhãn cho rõ nghĩa
+        txtUser = new JTextField("admin"); // Mặc định để test
         add(txtUser);
 
         add(new JLabel("  Mật khẩu:"));
@@ -27,24 +30,36 @@ public class LoginDialog extends JDialog {
 
         JButton btnLogin = new JButton("Đăng nhập");
         JButton btnExit = new JButton("Thoát");
+        
+        // Thêm màu sắc cho nút nhìn đẹp hơn xíu
+        btnLogin.setBackground(new Color(0, 102, 204));
+        btnLogin.setForeground(Color.WHITE);
+        btnExit.setBackground(new Color(204, 0, 0));
+        btnExit.setForeground(Color.WHITE);
+        
         add(btnLogin);
         add(btnExit);
 
         btnLogin.addActionListener(e -> xuLyDangNhap());
         btnExit.addActionListener(e -> System.exit(0));
+        
+        // Cho phép ấn Enter để đăng nhập luôn
+        getRootPane().setDefaultButton(btnLogin);
     }
 
     private void xuLyDangNhap() {
-        String user = txtUser.getText();
+        String maNV = txtUser.getText();
         String pass = new String(txtPass.getPassword());
         
-        taiKhoanHienTai = authService.dangNhap(user, pass);
+        // AuthService giờ trả về NhanVien nên code này khớp luôn
+        taiKhoanHienTai = authService.dangNhap(maNV, pass);
         
         if (taiKhoanHienTai != null) {
-            JOptionPane.showMessageDialog(this, "Xin chào " + taiKhoanHienTai.getFullName());
-            dispose();
+            // 3. SỬA HÀM GET: getFullName() -> getHoTen()
+            JOptionPane.showMessageDialog(this, "Xin chào: " + taiKhoanHienTai.getHoTen());
+            dispose(); // Đóng form login để về MainApp
         } else {
-            JOptionPane.showMessageDialog(this, "Sai thông tin đăng nhập!", "Lỗi", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Sai mã nhân viên hoặc mật khẩu!", "Lỗi Đăng Nhập", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
