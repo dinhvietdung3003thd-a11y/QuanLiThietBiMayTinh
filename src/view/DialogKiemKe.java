@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
-import model.KiemKeItem; // Import model độc lập
+import model.KiemKeItem; 
 import service.KiemKeService;
 
 public class DialogKiemKe extends JDialog {

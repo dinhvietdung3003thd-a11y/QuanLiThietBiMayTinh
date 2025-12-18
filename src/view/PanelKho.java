@@ -9,13 +9,7 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 import model.SanPham;
 import service.KhoService;
-
-// Đảm bảo bạn đã có các file Dialog này trong package view:
-import view.DialogNhapHang;
-import view.DialogKiemKe;
-import view.DialogLichSuKiemKe;
-import view.DialogXemSerial; 
-
+ 
 public class PanelKho extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
