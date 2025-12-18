@@ -19,7 +19,9 @@ CREATE DATABASE quanlymaytinh CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE quanlymaytinh;
 
 -- =======================================================
+
 -- NHÓM 1: CÁC BẢNG ĐỘC LẬP (Tạo trước vì không phụ thuộc ai)
+
 -- =======================================================
 
 -- 1. Bảng NHÂN VIÊN
